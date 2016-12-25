@@ -30,9 +30,23 @@ type alias Attribute =
 
 {-| Parses a String of XML
 -}
-parse : String -> Result (ParseErr ()) (ParseOk () Document)
+parse : String -> Result String Document
 parse =
     Combine.parse document
+        >> Result.mapError errMsg
+        >> Result.map third
+
+
+third : ( a, b, c ) -> c
+third ( _, _, c ) =
+    c
+
+
+errMsg : ParseErr () -> String
+errMsg =
+    third
+        >> List.intersperse "\n"
+        >> String.concat
 
 
 document : Parser s Document
