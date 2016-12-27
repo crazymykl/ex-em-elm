@@ -13,8 +13,10 @@ import Combine exposing (..)
 
 {-| An XML Document
 -}
-type Document
-    = Document (List Node)
+type alias Document =
+    { declaration : XmlDecl
+    , root : Node
+    }
 
 
 {-| A Node in an XML Document
@@ -22,10 +24,19 @@ type Document
 type Node
     = Element String (List Attribute) (List Node)
     | Text String
+    | Comment String
+    | CDATA String
 
 
 type alias Attribute =
     { name : String, value : String }
+
+
+type alias XmlDecl =
+    { version : String
+    , encoding : String
+    , standalone : Bool
+    }
 
 
 {-| Parses a String of XML
@@ -51,12 +62,46 @@ errMsg =
 
 document : Parser s Document
 document =
-    Document <$> manyTill node end
+    Document
+        <$> optional defaultXmlDecl xmlDecl
+        <*> node
+        <* end
+
+
+defaultXmlDecl : XmlDecl
+defaultXmlDecl =
+    XmlDecl "1.0" "UTF-8" True
+
+
+xmlDecl : Parser s XmlDecl
+xmlDecl =
+    XmlDecl
+        <$> (string "<?xml version" *> eq *> attributeValue)
+        <*> optional "UTF-8" (string " encoding" *> eq *> attributeValue)
+        <*> optional True (string " standalone" *> eq *> quotedYesNo)
+        <* (maybe whitespace <* string "?>")
+
+
+quotedYesNo : Parser s Bool
+quotedYesNo =
+    let
+        yn =
+            string "yes" <|> string "no"
+
+        quotedBy x =
+            between (string x) (string x)
+    in
+        (==) "yes" <$> ((quotedBy "'" yn) <|> (quotedBy "\"" yn))
 
 
 node : Parser s Node
 node =
-    text <|> tag
+    choice [ cdata, text, comment, tag ]
+
+
+comment : Parser s Node
+comment =
+    Comment <$> (string "<!--" *> regex "(?:[^-]|-[^-])*" <* string "-->")
 
 
 tag : Parser s Node
@@ -81,6 +126,11 @@ text =
     Text <$> regex "[^<]+"
 
 
+cdata : Parser s Node
+cdata =
+    CDATA <$> (string "<![CDATA[" *> regex ".*(?=]]>)" <* string "]]>")
+
+
 selfCloseTag : Parser s (List Node)
 selfCloseTag =
     string "/>" $> []
@@ -91,16 +141,21 @@ closeTag =
     between (string "</") (string ">") name
 
 
+eq : Parser s String
+eq =
+    maybe whitespace *> string "=" <* maybe whitespace
+
+
 attribute : Parser s Attribute
 attribute =
     Attribute
         <$> name
-        <*> (string "=" *> attributeValue)
+        <*> (eq *> attributeValue)
 
 
 attributeValue : Parser s String
 attributeValue =
-    regex "'[^']*'|\"[^\"]*\""
+    String.slice 1 -1 <$> regex "'[^']*'|\"[^\"]*\""
 
 
 attributeList : Parser s (List Attribute)
