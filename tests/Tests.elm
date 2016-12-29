@@ -33,12 +33,14 @@ refuteParses s () =
 all : Test
 all =
     describe "Parsing Smoke Test"
-        [ test "It parses emptiness" <| assertParses ""
-        , test "It parses text" <| assertParses "foo"
+        [ test "It parses text" <| assertParses "foo"
         , test "It parses self-closing tags" <| assertParses "<mew/>"
         , test "It parses tags containing text" <| assertParses "<arf>1</arf>"
         , test "It parses nested tags" <| assertParses "<poo><goo/></poo>"
         , test "It parses tags with attributes" <| assertParses "<foo mew='lol'/>"
+        , test "It parses comments" <| assertParses "<!-- waffle iron -->"
+        , test "It parses CDATA" <| assertParses "<![CDATA[ ]]>"
+        , test "It barfs on emptiness" <| refuteParses ""
         , test "It barfs on malformed tags" <| refuteParses "<foo "
         , test "It barfs on invalid tag names" <| refuteParses "<21></21>"
         , test "It barfs on unclosed tags" <| refuteParses "<mew>"
