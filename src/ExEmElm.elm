@@ -77,8 +77,8 @@ xmlDecl : Parser s XmlDecl
 xmlDecl =
     XmlDecl
         <$> (string "<?xml version" *> eq *> attributeValue)
-        <*> optional "UTF-8" (string " encoding" *> eq *> attributeValue)
-        <*> optional True (string " standalone" *> eq *> quotedYesNo)
+        <*> optional defaultXmlDecl.encoding (string " encoding" *> eq *> attributeValue)
+        <*> optional defaultXmlDecl.standalone (string " standalone" *> eq *> quotedYesNo)
         <* (maybe whitespace <* string "?>")
 
 
