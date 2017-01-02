@@ -14,7 +14,7 @@ import Combine exposing (..)
 {-| An XML Document
 -}
 type alias Document =
-    { declaration : XmlDecl
+    { declaration : Maybe XmlDecl
     , root : Node
     }
 
@@ -63,7 +63,7 @@ errMsg =
 document : Parser s Document
 document =
     Document
-        <$> optional defaultXmlDecl xmlDecl
+        <$> maybe xmlDecl
         <*> node
         <* end
 
