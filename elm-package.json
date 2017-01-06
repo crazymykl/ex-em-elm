@@ -7,7 +7,8 @@
         "src"
     ],
     "exposed-modules": [
-      "ExEmElm"
+      "ExEmElm.Parser",
+      "ExEmElm.Encoder"
     ],
     "dependencies": {
         "Bogdanp/elm-combine": "3.1.1 <= v < 4.0.0",

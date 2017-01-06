@@ -1,45 +1,16 @@
-module ExEmElm exposing (Document, Node, parse)
+module ExEmElm.Parser exposing (parse)
 
 {-| This library allows the parsing of XML
-
-@docs Document, Node
 
 @docs parse
 
 -}
 
+import ExEmElm.Types as E exposing (Document, Node, XmlDecl, Attribute)
 import Combine exposing (..)
 
 
-{-| An XML Document
--}
-type alias Document =
-    { declaration : Maybe XmlDecl
-    , root : Node
-    }
-
-
-{-| A Node in an XML Document
--}
-type Node
-    = Element String (List Attribute) (List Node)
-    | Text String
-    | Comment String
-    | CDATA String
-
-
-type alias Attribute =
-    { name : String, value : String }
-
-
-type alias XmlDecl =
-    { version : String
-    , encoding : String
-    , standalone : Bool
-    }
-
-
-{-| Parses a String of XML
+{-| Parses an XML document from a string
 -}
 parse : String -> Result String Document
 parse =
@@ -62,20 +33,20 @@ errMsg =
 
 document : Parser s Document
 document =
-    Document
+    E.document
         <$> maybe xmlDecl
-        <*> node
+        <*> element
         <* end
 
 
 defaultXmlDecl : XmlDecl
 defaultXmlDecl =
-    XmlDecl "1.0" "UTF-8" True
+    E.xmlDecl "1.0" "UTF-8" True
 
 
 xmlDecl : Parser s XmlDecl
 xmlDecl =
-    XmlDecl
+    E.xmlDecl
         <$> (string "<?xml version" *> eq *> attributeValue)
         <*> optional defaultXmlDecl.encoding (string " encoding" *> eq *> attributeValue)
         <*> optional defaultXmlDecl.standalone (string " standalone" *> eq *> quotedYesNo)
@@ -96,24 +67,20 @@ quotedYesNo =
 
 node : Parser s Node
 node =
-    choice [ cdata, text, comment, tag ]
+    lazy <| \() -> choice [ cdata, text, comment, element ]
 
 
 comment : Parser s Node
 comment =
-    Comment <$> (string "<!--" *> regex "(?:[^-]|-[^-])*" <* string "-->")
+    E.comment <$> (string "<!--" *> regex "(?:[^-]|-[^-])*" <* string "-->")
 
 
-tag : Parser s Node
-tag =
-    let
-        tag_ () =
-            Element
-                <$> (string "<" *> name)
-                <*> (many whitespace *> attributeList)
-                <*> (selfCloseTag <|> (string ">" *> many node <* closeTag))
-    in
-        lazy tag_
+element : Parser s Node
+element =
+    E.element
+        <$> (string "<" *> name)
+        <*> (many whitespace *> attributeList)
+        <*> (selfCloseTag <|> (string ">" *> many node <* closeTag))
 
 
 name : Parser s String
@@ -123,12 +90,12 @@ name =
 
 text : Parser s Node
 text =
-    Text <$> regex "[^<]+"
+    E.text <$> regex "[^<]+"
 
 
 cdata : Parser s Node
 cdata =
-    CDATA <$> (string "<![CDATA[" *> regex ".*(?=]]>)" <* string "]]>")
+    E.cdata <$> (string "<![CDATA[" *> regex ".*(?=]]>)" <* string "]]>")
 
 
 selfCloseTag : Parser s (List Node)
@@ -148,7 +115,7 @@ eq =
 
 attribute : Parser s Attribute
 attribute =
-    Attribute
+    E.attribute
         <$> name
         <*> (eq *> attributeValue)
 
