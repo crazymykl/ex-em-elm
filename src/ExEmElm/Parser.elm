@@ -35,7 +35,8 @@ document : Parser s Document
 document =
     E.document
         <$> maybe xmlDecl
-        <*> element
+        <*> (many whitespace *> element <* many whitespace)
+        <* many whitespace
         <* end
 
 
