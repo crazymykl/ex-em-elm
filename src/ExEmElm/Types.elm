@@ -1,7 +1,7 @@
 module ExEmElm.Types
     exposing
         ( Document
-        , Node
+        , Node(Element, Text)
         , Attribute
         , XmlDecl
         , document
@@ -152,3 +152,13 @@ decl =
                 ++ " ?>"
     in
         Maybe.map declTag >> Maybe.withDefault ""
+
+
+attrsForNode : Node -> List Attribute
+attrsForNode x =
+    case x of
+        Element tag attrs children ->
+            attrs
+
+        _ ->
+            []
