@@ -14,6 +14,9 @@ module ExEmElm.Types
         , xmlDecl
         , nodeToString
         , docToString
+        , childrenOfNode
+        , tagOfNode
+        , textOfNode
         )
 
 import Regex exposing (regex, replace, HowMany(..))
@@ -85,6 +88,36 @@ attribute name value =
         }
 
 
+childrenOfNode : Node -> List Node
+childrenOfNode node =
+    case node of
+        Element tag attrs children ->
+            children
+
+        _ ->
+            []
+
+
+tagOfNode : Node -> String
+tagOfNode node =
+    case node of
+        Element tag attrs children ->
+            tag
+
+        _ ->
+            ""
+
+
+textOfNode : Node -> String
+textOfNode node =
+    case node of
+        Text text ->
+            text
+
+        _ ->
+            ""
+
+
 xmlDecl : String -> String -> Bool -> XmlDecl
 xmlDecl =
     XmlDecl
@@ -152,3 +185,13 @@ decl =
                 ++ " ?>"
     in
         Maybe.map declTag >> Maybe.withDefault ""
+
+
+attrsForNode : Node -> List Attribute
+attrsForNode x =
+    case x of
+        Element tag attrs children ->
+            attrs
+
+        _ ->
+            []
