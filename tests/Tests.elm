@@ -7,7 +7,7 @@ import Result.Extra
 import ExEmElm.Parser
 import ExEmElm.Encoder
 import ExEmElm.Types exposing (root, element, text, comment, cdata, attribute)
-import ExEmElm.Traverse exposing (queryTag, innerText)
+import ExEmElm.Traverse exposing (innerText, at)
 
 
 parses : String -> Bool
@@ -60,13 +60,13 @@ assertTreeEncodes xmlString resultXmlString () =
             |> Expect.equal resultXmlString
 
 
-assertQueryByTag : String -> String -> String -> () -> Expect.Expectation
-assertQueryByTag xmlString qTag resultXmlString () =
+assertQueryByTag : String -> List String -> String -> () -> Expect.Expectation
+assertQueryByTag xmlString qFields resultXmlString () =
     let
         rootNode =
             rootNodeOfXml xmlString
     in
-        ExEmElm.Traverse.queryTag rootNode qTag
+        ExEmElm.Traverse.at rootNode qFields
             |> List.map ExEmElm.Encoder.node
             |> String.join ""
             |> Expect.equal resultXmlString
@@ -149,10 +149,15 @@ resultInnerXmlString =
     """   63 English     100947 5 Store Report   100946 AAA New filter Montevideo   90158 Current VMM Stores- HS   90157 Current live stores   90187 Launch stores   90159 None   87975 Washington State Stores   """
 
 
+resultQueryByTag : String
+resultQueryByTag =
+    "<id>63</id>"
+
+
 traverse : Test
 traverse =
     describe "It queries the xml tree"
         [ test "It traverses from root" <| assertTreeEncodes testXmlString resultXmlString
         , test "It stringifies inner XML" <| assertInnerTextTraversal testXmlString resultInnerXmlString
-        , test "queries for child of root: languageOption" <| assertQueryByTag testXmlString "language_options" languageOptionsString
+        , test "queries for nested Node according to path: UIData, language_options, Label, id" <| assertQueryByTag testXmlString [ "UIData", "language_options", "Label", "id" ] resultQueryByTag
         ]
