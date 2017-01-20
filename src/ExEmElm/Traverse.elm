@@ -1,29 +1,33 @@
 module ExEmElm.Traverse exposing (queryTag, innerText)
 
-import ExEmElm.Types exposing (Node(..))
+import ExEmElm.Types exposing (Node, childrenOfNode, tagOfNode, textOfNode)
 
 
 queryTag : Node -> String -> List Node
 queryTag rootNode tagString =
-    case rootNode of
-        Element tag attrs children ->
-            if tag == tagString then
-                [ rootNode ]
-            else
-                List.concatMap (\n -> queryTag n tagString) children
+    let
+        tag =
+            tagOfNode rootNode
 
-        _ as e ->
-            []
+        children =
+            childrenOfNode rootNode
+    in
+        if tag == tagString then
+            [ rootNode ]
+        else
+            List.concatMap (\n -> queryTag n tagString) children
 
 
 innerText : Node -> String
 innerText rootNode =
-    case rootNode of
-        Text text ->
+    let
+        text =
+            textOfNode rootNode
+
+        children =
+            childrenOfNode rootNode
+    in
+        if text /= "" then
             text
-
-        Element tag attrs children ->
+        else
             List.map innerText children |> String.join ""
-
-        _ ->
-            ""

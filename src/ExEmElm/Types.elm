@@ -1,7 +1,7 @@
 module ExEmElm.Types
     exposing
         ( Document
-        , Node(Element, Text)
+        , Node
         , Attribute
         , XmlDecl
         , document
@@ -14,6 +14,9 @@ module ExEmElm.Types
         , xmlDecl
         , nodeToString
         , docToString
+        , childrenOfNode
+        , tagOfNode
+        , textOfNode
         )
 
 import Regex exposing (regex, replace, HowMany(..))
@@ -83,6 +86,36 @@ attribute name value =
         { name = name
         , value = value
         }
+
+
+childrenOfNode : Node -> List Node
+childrenOfNode node =
+    case node of
+        Element tag attrs children ->
+            children
+
+        _ ->
+            []
+
+
+tagOfNode : Node -> String
+tagOfNode node =
+    case node of
+        Element tag attrs children ->
+            tag
+
+        _ ->
+            ""
+
+
+textOfNode : Node -> String
+textOfNode node =
+    case node of
+        Text text ->
+            text
+
+        _ ->
+            ""
 
 
 xmlDecl : String -> String -> Bool -> XmlDecl
