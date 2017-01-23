@@ -98,24 +98,27 @@ childrenOfNode node =
             []
 
 
-tagOfNode : Node -> String
+tagOfNode : Node -> Maybe String
 tagOfNode node =
     case node of
         Element tag attrs children ->
-            tag
+            Just tag
 
         _ ->
-            ""
+            Nothing
 
 
-textOfNode : Node -> String
+textOfNode : Node -> Maybe String
 textOfNode node =
     case node of
         Text text ->
-            text
+            Just text
+
+        CDATA text ->
+            Just text
 
         _ ->
-            ""
+            Nothing
 
 
 xmlDecl : String -> String -> Bool -> XmlDecl

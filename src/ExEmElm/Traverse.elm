@@ -8,6 +8,7 @@ innerText rootNode =
     let
         text =
             textOfNode rootNode
+                |> Maybe.withDefault ""
 
         children =
             childrenOfNode rootNode
@@ -32,13 +33,13 @@ at rootNode fields =
                 []
 
             [ x ] ->
-                if x == tag then
+                if Just x == tag then
                     [ rootNode ]
                 else
                     []
 
             x :: xs ->
-                if x == tag then
-                    List.concatMap (\n -> at n xs) children
+                if Just x == tag then
+                    List.concatMap (flip at xs) children
                 else
                     []
