@@ -8,7 +8,8 @@
     ],
     "exposed-modules": [
       "ExEmElm.Parser",
-      "ExEmElm.Encoder"
+      "ExEmElm.Encoder",
+      "ExEmElm.Traverse"
     ],
     "dependencies": {
         "Bogdanp/elm-combine": "3.1.1 <= v < 4.0.0",

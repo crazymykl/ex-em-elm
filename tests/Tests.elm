@@ -41,13 +41,7 @@ assertNodeEncodesTo node str () =
 
 assertNodeRoundtrips : String -> () -> Expect.Expectation
 assertNodeRoundtrips str =
-    let
-        parsedNode =
-            ExEmElm.Parser.parse str
-                |> Result.map root
-                |> Result.withDefault (text "Unparsable")
-    in
-        assertNodeEncodesTo parsedNode str
+    assertNodeEncodesTo (rootNodeOfXml str) str
 
 
 assertTreeEncodes : String -> String -> () -> Expect.Expectation
@@ -66,7 +60,7 @@ assertQueryByTag xmlString qFields resultXmlString () =
         rootNode =
             rootNodeOfXml xmlString
     in
-        ExEmElm.Traverse.at rootNode qFields
+        ExEmElm.Traverse.at qFields rootNode
             |> List.map ExEmElm.Encoder.node
             |> String.join ""
             |> Expect.equal resultXmlString

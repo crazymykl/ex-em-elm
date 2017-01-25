@@ -1,45 +1,48 @@
-module ExEmElm.Traverse exposing (innerText, at)
+module ExEmElm.Traverse exposing (innerText, at, textAt)
+
+{-| This library allows the traversal/querying of parsed XML
+
+@docs innerText, at, textAt
+
+-}
 
 import ExEmElm.Types exposing (Node, childrenOfNode, tagOfNode, textOfNode)
 
 
+{-| Retrives the text inside the node and all subnodes
+-}
 innerText : Node -> String
-innerText rootNode =
-    let
-        text =
-            textOfNode rootNode
-                |> Maybe.withDefault ""
-
-        children =
-            childrenOfNode rootNode
-    in
-        if text /= "" then
+innerText node =
+    case textOfNode node of
+        Just text ->
             text
-        else
-            List.map innerText children |> String.join ""
+
+        Nothing ->
+            List.map innerText (childrenOfNode node)
+                |> String.join ""
 
 
-at : Node -> List String -> List Node
-at rootNode fields =
-    let
-        tag =
-            tagOfNode rootNode
+{-| Traverse down a path of tags
+-}
+at : List String -> Node -> List Node
+at path node =
+    case path of
+        [] ->
+            []
 
-        children =
-            childrenOfNode rootNode
-    in
-        case fields of
-            [] ->
+        x :: xs ->
+            if Just x == tagOfNode node then
+                if List.isEmpty xs then
+                    [ node ]
+                else
+                    List.concatMap (at xs) <| childrenOfNode node
+            else
                 []
 
-            [ x ] ->
-                if Just x == tag then
-                    [ rootNode ]
-                else
-                    []
 
-            x :: xs ->
-                if Just x == tag then
-                    List.concatMap (flip at xs) children
-                else
-                    []
+{-| Get the text inside all tags at the end of the given path
+-}
+textAt : List String -> Node -> List String
+textAt path node =
+    at path node
+        |> List.map innerText
