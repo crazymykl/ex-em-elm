@@ -188,12 +188,12 @@ traverse =
     describe "It queries the xml tree"
         [ test "It traverses from root" <| assertTreeEncodes testXmlString resultXmlString
         , test "It stringifies inner XML" <| assertInnerTextTraversal testXmlString resultInnerXmlString
-        , test "queries for nested Node according to path: UIData" <| assertQueryByTag testXmlString [ "UIData" ] resultQueryByTag1
-        , test "queries for nested Node according to path: UIData, language_options" <| assertQueryByTag testXmlString [ "UIData", "language_options" ] resultQueryByTag2
-        , test "queries for nested Node according to path: UIData, language_options, Label" <| assertQueryByTag testXmlString [ "UIData", "language_options", "Label" ] resultQueryByTag3
-        , test "queries for nested Node according to path: UIData, language_options, Label, id" <| assertQueryByTag testXmlString [ "UIData", "language_options", "Label", "id" ] resultQueryByTag4
-        , test "queries for nested Node according to path: UIData, filters" <| assertQueryByTag testXmlString [ "UIData", "filters" ] resultQueryByTag5
-        , test "queries for nested Node according to path: UIData, filters, Label" <| assertQueryByTag testXmlString [ "UIData", "filters", "Label" ] resultQueryByTag6
-        , test "queries for nested Node according to path: UIData, filters, Label, id" <| assertQueryByTag testXmlString [ "UIData", "filters", "Label", "id" ] resultQueryByTag7
-        , test "queries for nested Node according to path: UIData, filters, Label, name" <| assertQueryByTag testXmlString [ "UIData", "filters", "Label", "name" ] resultQueryByTag8
+        , test "queries for nested Node according to an empty path" <| assertQueryByTag testXmlString [] resultQueryByTag1
+        , test "queries for nested Node according to path: language_options" <| assertQueryByTag testXmlString [ "language_options" ] resultQueryByTag2
+        , test "queries for nested Node according to path: language_options, Label" <| assertQueryByTag testXmlString [ "language_options", "Label" ] resultQueryByTag3
+        , test "queries for nested Node according to path: language_options, Label, id" <| assertQueryByTag testXmlString [ "language_options", "Label", "id" ] resultQueryByTag4
+        , test "queries for nested Node according to path: filters" <| assertQueryByTag testXmlString [ "filters" ] resultQueryByTag5
+        , test "queries for nested Node according to path: filters, Label" <| assertQueryByTag testXmlString [ "filters", "Label" ] resultQueryByTag6
+        , test "queries for nested Node according to path: filters, Label, id" <| assertQueryByTag testXmlString [ "filters", "Label", "id" ] resultQueryByTag7
+        , test "queries for nested Node according to path: filters, Label, name" <| assertQueryByTag testXmlString [ "filters", "Label", "name" ] resultQueryByTag8
         ]

@@ -26,18 +26,25 @@ innerText node =
 -}
 at : List String -> Node -> List Node
 at path node =
-    case path of
-        [] ->
-            []
-
-        x :: xs ->
-            if Just x == tagOfNode node then
-                if List.isEmpty xs then
-                    [ node ]
-                else
-                    List.concatMap (at xs) <| childrenOfNode node
+    let
+        follow path node =
+            if List.isEmpty path then
+                [ node ]
             else
-                []
+                List.concatMap (matchesPath path) <| childrenOfNode node
+
+        matchesPath path node =
+            case path of
+                [] ->
+                    []
+
+                x :: xs ->
+                    if Just x == tagOfNode node then
+                        follow xs node
+                    else
+                        []
+    in
+        follow path node
 
 
 {-| Get the text inside all tags at the end of the given path
