@@ -1,8 +1,8 @@
-module ExEmElm.Parser exposing (parse)
+module ExEmElm.Parser exposing (parse, root)
 
 {-| This library allows the parsing of XML
 
-@docs parse
+@docs parse, root
 
 -}
 
@@ -17,6 +17,13 @@ parse =
     Combine.parse document
         >> Result.mapError errMsg
         >> Result.map third
+
+
+{-| Retrives the root node of a document
+-}
+root : Document -> Node
+root =
+    E.root
 
 
 third : ( a, b, c ) -> c
