@@ -1,10 +1,10 @@
-module ExEmElm.Decoder exposing (string, int, float, bool, field, list, Node)
+module ExEmElm.Decoder exposing (string, int, float, bool, field, list, maybe, Node)
 
 {-| Access and decode fields from XML elements
 
 @docs Node, field
 
-@docs list, string, int, float, bool
+@docs maybe, list, string, int, float, bool
 -}
 
 import ExEmElm.Traverse exposing (textAt)
@@ -67,6 +67,15 @@ list : (a -> Result e b) -> List a -> Result e (List b)
 list f xs =
     List.map f xs
         |> combine
+
+
+{-| Make another decoder optional
+-}
+maybe : (List a -> Result String b) -> List a -> Result String (Maybe b)
+maybe f xs =
+    f xs
+        |> Result.toMaybe
+        |> Ok
 
 
 {-| Access the data contained in the children with a given tag, then decode it
